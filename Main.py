@@ -127,3 +127,8 @@ while run:
     pygame.display.flip()
 
 pygame.quit()
+
+
+
+#git config --global user.name "jamesperram92"
+#git config --global user.email "jamesperram@gmail.com"
