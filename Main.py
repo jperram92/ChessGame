@@ -176,7 +176,7 @@ def draw_valid(moves):
     else:
         colour = 'blue'
     for i in range(len(moves)):
-        pygame.draw.circle(screen, colour, (moves[i][0] * 100 + 50, moves[i][1] * 100 + 500), 5)
+        pygame.draw.circle(screen, colour, (moves[i][0] * 100 + 50, moves[i][1] * 100 + 50), 5)
 
 #check for valid moves for just selected piece
 def check_valid_moves():
