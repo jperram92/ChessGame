@@ -69,6 +69,7 @@ white_pawn = pygame.image.load('Images/white pawn.png')
 white_pawn = pygame.transform.scale(white_pawn, (80, 80))
 white_pawn_small = pygame.transform.scale(white_pawn, (35, 35))
 
+#Load in lists for each colour to match the associated image or small image
 white_images = [white_pawn, white_queen, white_king, white_knight, white_rook, white_bishop]
 small_white_images = [white_pawn_small, white_queen_small, white_king_small, white_knight_small, 
     white_rook_small, white_bishop_small]
@@ -112,17 +113,210 @@ def draw_board():
             pygame.draw.line(screen, 'black', (0, 100 * i), (800, 100 * i), 2)
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
 
+#Draw pieces on board
+def draw_pieces():
+    #cant do 16 as you wont always have 16 pieces the whole time, check how many pieces in the white pieces list
+    for i in range(len(white_pieces)):
+        #piece list - white pieces list is the 2 x pieces etc, but we need to know which pieces and the index value from the original "Piece List"
+        index = piece_list.index(white_pieces[i])
+        if white_pieces[i] == 'pawn':
+            screen.blit(white_pawn, (white_locations[i][0] * 100 + 10, white_locations[i][1] * 100 + 10 ))
+        else:
+            screen.blit(white_images[index], (white_locations[i][0] * 100 + 10, white_locations[i][1] * 100 + 10 ))
+        if turn_step < 2:
+            #index will be reduced from 100 overtime, need to accomodate for selecting the pieces and how to know its a part of the original index list
+            if selection == i:
+                pygame.draw.rect(screen, 'red', [white_locations[i][0] * 100 + 1, white_locations[i][1] * 100 + 1,
+                100, 100], 2)
+
+
+    for i in range(len(black_pieces)):
+        #piece list - white pieces list is the 2 x pieces etc, but we need to know which pieces and the index value from the original "Piece List"
+        index = piece_list.index(black_pieces[i])
+        if black_pieces[i] == 'pawn':
+            screen.blit(black_pawn, (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10 ))
+        else:
+            screen.blit(black_images[index], (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10 ))   
+        if turn_step >= 2:
+            #index will be reduced from 100 overtime, need to accomodate for selecting the pieces and how to know its a part of the original index list
+            if selection == i:
+                pygame.draw.rect(screen, 'blue', [black_locations[i][0] * 100 + 1, black_locations[i][1] * 100 + 1,
+                100, 100], 2)
+
+#function to check all pieces valid options on board
+def check_options(pieces, locations, turn):
+    moves_list = []
+    all_moves_list = []
+    for i in range(len(pieces)):
+        location = locations[i]
+        piece = pieces[i]
+        #figure out what move each piece can make
+        if piece == 'pawn': 
+            moves_list = check_pawn(location, turn)
+        '''elif piece == 'rook':
+            moves_list = check_rook(location, turn)
+        elif piece == 'knight':
+            moves_list = check_knight(location, turn)
+        elif piece == 'bishop':
+            moves_list = check_bishop(location, turn)
+        elif piece == 'queen':
+            moves_list = check_queen(location, turn)
+        elif piece == 'king':
+            moves_list = check_king(location, turn)'''
+        all_moves_list.append(moves_list)
+    return all_moves_list
+
+#check valid pawn moves
+#check initial piece position, if it can move more then 2 positions
+
+#draw valid moves on screen
+def draw_valid(moves):
+    if turn_step < 2:
+        colour = 'red'
+    else:
+        colour = 'blue'
+    for i in range(len(moves)):
+        pygame.draw.circle(screen, colour, (moves[i][0] * 100 + 50, moves[i][1] * 100 + 500), 5)
+
+#check for valid moves for just selected piece
+def check_valid_moves():
+    #white turn
+    if turn_step < 2:
+        options_list = white_options
+    else:
+        options_list = black_options
+    valid_options = options_list[selection]
+    return valid_options
+
+def check_pawn(position, color):
+    moves_list = []
+    #turn taking
+    if color == 'white':
+        #not currently taken up by another white piece and starting moving 1
+        if (position[0], position [1] + 1) not in white_locations and \
+            (position[0], position [1] + 1) not in black_locations and position[1] < 7: 
+            moves_list.append((position[0], position[1] + 1))
+        #not currently taken up by another white piece and allowing initial moving 2 (I.e starting square)
+        if (position[0], position [1] + 2) not in white_locations and \
+            (position[0], position [1] + 2) not in black_locations and position[1] == 1: 
+            moves_list.append((position[0], position[1] + 2))
+        #diagonal attack vector as it can take pawns diagnoally right
+        if (position[0] + 1, position[1] + 1) in black_locations:
+            moves_list.append((position[0] + 1, position[1] + 1))
+        #diagonal attack vector as it can take pawns diagnoally left
+        if (position[0] - 1, position[1] + 1) in black_locations:
+            moves_list.append((position[0] - 1, position[1] + 1))
+    #Replicate opposite of what = black (i.e opposite of if must be else)
+    #To adjust this everything needs to be in reverse to show the other side of the board
+    else:
+        #not currently taken up by another white piece and starting moving 1
+        #Has to be greater then 0 as its on the other side of board and must be start on row 1
+        if (position[0], position [1] - 1) not in white_locations and \
+            (position[0], position [1] - 1) not in black_locations and position[1] > 0: 
+            moves_list.append((position[0], position[1] - 1))
+        #not currently taken up by another white piece and allowing initial moving 2 (I.e starting square)
+        #adjust for being able to move two down (From the other side of the board) - Position is row 6 where pawn start on other side
+        if (position[0], position [1] - 2) not in white_locations and \
+            (position[0], position [1] - 2) not in black_locations and position[1] == 6: 
+            moves_list.append((position[0], position[1] - 2))
+        #diagonal attack vector as it can take pawns diagnoally right
+        if (position[0] + 1, position[1] - 1) in white_locations:
+            moves_list.append((position[0] + 1, position[1] - 1))
+        #diagonal attack vector as it can take pawns diagnoally left
+        if (position[0] + 1, position[1] - 1) in white_locations:
+            moves_list.append((position[0] - 1, position[1] - 1))   
+    return moves_list
+
+def check_rook(position, colour):
+    pass
+
+def check_knight(position, colour):
+    pass
+
+def check_bishop(position, colour):
+    pass
+
+def check_queen(position, colour):
+    pass
+
+def check_king(position, colour):
+    pass
 # Main Loop If the game is running, using FPS blocker + screen being filled
+black_options = check_options(black_pieces, black_locations, 'black')
+white_options = check_options(white_pieces, white_locations, 'white')
 run = True
 while run: 
     timer.tick(fps)
     screen.fill('dark grey')
     draw_board()
+    draw_pieces()
+    #selected a piece (something)
+    if selection != 100:
+        #check the valid moves we have available
+        valid_moves = check_valid_moves()
+        #Draw them on the screen if valid
+        draw_valid(valid_moves)
     
     # Initiate game - So input (Keyboard, mouse, etc) is able to be initiated
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        #check if its less mouse click (python can do all, but do all of them anyway if they use right or middle click etc)
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            #Floor division divides down to determine number
+            x_coord = event.pos[0] // 100 
+            y_coord = event.pos[1] // 100 
+            click_coords = (x_coord, y_coord)
+            #Show white positions to be able to click and turn them red box around
+            if turn_step <= 1:
+                #only able to select the coordinates in the white location turn only
+                if click_coords in white_locations:
+                    #whatever piece is clicked, select the associated linked index
+                    selection = white_locations.index(click_coords)
+                    if turn_step == 0:
+                        turn_step = 1
+                #must be able to move within the valid move to move to and outside the total index of available options 100 > 64)
+                if click_coords in valid_moves and selection != 100:
+                    white_locations[selection] = click_coords
+                    #clicked as white but it shouldnt be in a current black piece position
+                    if click_coords in black_locations:
+                        black_piece = black_locations.index(click_coords)
+                        captured_pieces_white.append(black_pieces[black_piece])
+                        #Removing piece the white piece just landed on from pieces and location list
+                        black_pieces.pop(black_piece)
+                        black_locations.pop(black_piece)
+                    black_options = check_options(black_pieces, black_locations, 'black')
+                    white_options = check_options(white_pieces, white_locations, 'white')
+                    turn_step = 2
+                    selection = 100 
+                    #every new turn, they need to recalculate what is considered valid or not
+                    valid_moves = []
+            #Show white positions to be able to click and turn them red box around
+            if turn_step > 1:
+                #only able to select the coordinates in the white location turn only
+                if click_coords in black_locations:
+                    #whatever piece is clicked, select the associated linked index
+                    selection = black_locations.index(click_coords)
+                    #black player has selected a piece
+                    if turn_step == 2:
+                        turn_step = 3
+                #must be able to move within the valid move to move to and outside the total index of available options 100 > 64)
+                if click_coords in valid_moves and selection != 100:
+                    black_locations[selection] = click_coords
+                    #clicked as white but it shouldnt be in a current black piece position
+                    if click_coords in white_locations:
+                        white_piece = white_locations.index(click_coords)
+                        captured_pieces_black.append(white_pieces[white_piece])
+                        #Removing piece the white piece just landed on from pieces and location list
+                        white_pieces.pop(white_piece)
+                        white_locations.pop(white_piece)
+                    black_options = check_options(black_pieces, black_locations, 'black')
+                    white_options = check_options(white_pieces, white_locations, 'white')
+                    #Resetting back to turn step 0 for other turn
+                    turn_step = 0
+                    selection = 100 
+                    #every new turn, they need to recalculate what is considered valid or not
+                    valid_moves = []
 
     pygame.display.flip()
 
