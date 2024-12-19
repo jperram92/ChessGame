@@ -153,9 +153,9 @@ def check_options(pieces, locations, turn):
         #figure out what move each piece can make
         if piece == 'pawn': 
             moves_list = check_pawn(location, turn)
-        '''elif piece == 'rook':
+        elif piece == 'rook':
             moves_list = check_rook(location, turn)
-        elif piece == 'knight':
+        '''elif piece == 'knight':
             moves_list = check_knight(location, turn)
         elif piece == 'bishop':
             moves_list = check_bishop(location, turn)
@@ -228,7 +228,47 @@ def check_pawn(position, color):
     return moves_list
 
 def check_rook(position, colour):
-    pass
+    moves_list = []
+    if colour == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+    #4 components up, down, left and right
+    #When i go up and down, y & X need to adjust accordingly
+    for i in range(4):
+        path = True
+        #if piece is open, then adds another piece to chain - i.e if start has 3 empty slots above then chain needs to add more integerars
+        chain = 1
+        if i == 0:
+            x = 0 
+            y = 1
+        elif i == 1:
+            x = 0
+            y = -1
+        elif i == 2:
+            x = 1
+            y = 0
+        else:
+            x = -1
+            y = 0 
+        #sheck if anything positioning is in the way + chain then it should know it can move in this positioning + actually take pieces
+        while path:
+            #check if move to the any direction x = 1, chain starts as 1, first position we check is y position, check if valid Y
+            #and one to the current, if not in the friends list (i.e should be able to take an enemy piece)
+            #empty or enemy - add ot moves list
+            #if enemy then path is false (cant go forward)
+            if (position[0] + (chain * x), position[1] + (chain * y)) not in friends_list and \
+                    0 <= position[0] + (chain * x) <=7 and 0 <= position[1] + (chain * y) <= 7:
+                moves_list.append((position[0] + (chain * x), position[1] + (chain * y)))
+                if (position[0] + (chain * x), position[1] + (chain * y)) in enemies_list:
+                        path = False
+                chain += 1
+            else:
+                path = False
+
+    return moves_list
 
 def check_knight(position, colour):
     pass
