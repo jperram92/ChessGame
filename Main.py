@@ -97,7 +97,7 @@ small_white_images = [white_pawn_small, white_queen_small, white_king_small, whi
 black_images = [black_pawn, black_queen, black_king, black_knight, black_rook, black_bishop]
 # List of small-sized images for black pieces
 # Used for displaying captured black pieces in the UI or sidebar
-black_white_images = [black_pawn_small, black_queen_small, black_king_small, black_knight_small, 
+small_black_images = [black_pawn_small, black_queen_small, black_king_small, black_knight_small, 
     black_rook_small, black_bishop_small]
 
 # List of chess piece types
@@ -106,7 +106,7 @@ black_white_images = [black_pawn_small, black_queen_small, black_king_small, bla
 piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 
 
-
+#function to draw the board onto the screen
 def draw_board():
     # Draw the chessboard grid with alternating colors
     for i in range(32):
@@ -133,7 +133,7 @@ def draw_board():
             # Horizontal lines
             pygame.draw.line(screen, 'black', (0, 100 * i), (800, 100 * i), 2)
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
-
+#function to draw the pieces onto the board from the images in the file
 def draw_pieces():
     # Loop through all white pieces and draw them on the board
     for i in range(len(white_pieces)):
@@ -221,6 +221,22 @@ def check_valid_moves():
     # Get the valid moves for the selected piece
     valid_options = options_list[selection]
     return valid_options
+
+#draw captured pieces on the side of the screen
+def draw_captured():
+    for i in range(len(captured_pieces_white)):
+        captured_piece = captured_pieces_white[i]
+        #to find the acutal indexed piece which was captured
+        index = piece_list.index(captured_piece)
+        #45 by 45 squares originally
+        screen.blit(small_black_images[index], (825, 5 + 50*i))
+    for i in range(len(captured_pieces_black)):
+        captured_piece = captured_pieces_black[i]
+        #to find the acutal indexed piece which was captured
+        index = piece_list.index(captured_piece)
+        #45 by 45 squares originally
+        screen.blit(small_white_images[index], (925, 5 + 50*i))
+    
 #Check for how the pawn will move, validate and take pieces
 def check_pawn(position, color):
     moves_list = []
@@ -411,6 +427,7 @@ while run:
     screen.fill('dark grey') # Clear the screen with a background color
     draw_board() # Draw the chessboard
     draw_pieces() # Draw the current positions of the pieces
+    draw_captured() #Draw the pieces captured and position on the screen (Using Mini pieces)
 
     # Highlight valid moves if a piece is selected
     if selection != 100:
