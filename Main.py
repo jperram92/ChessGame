@@ -121,7 +121,7 @@ def draw_board():
         # Draw the status bar and borders
         pygame.draw.rect(screen, 'grey', [0,800, WIDTH, 100]) # Status bar background
         pygame.draw.rect(screen, 'gold', [0,800, WIDTH, 100], 5) # Status bar border
-        pygame.draw.rect(screen, 'gold', [800,0, 200, 100], 5) # Side panel border
+        pygame.draw.rect(screen, 'gold', [800,0, 200, HEIGHT], 5) # Side panel border
 
         # Display game status text
         status_text = ['White: Select a Place to Move!', 'White: Select a Destination!',
