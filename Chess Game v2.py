@@ -194,15 +194,11 @@ def handle_menu_click(pos):
 #function to draw the board onto the screen
 def draw_board():
     # Draw the chessboard grid with alternating colors
-    for i in range(32):
-        column = i % 4 # Determine the column based on index
-        row = i // 4 # Determine the row based on index
-        if row % 2 == 0:  # Check for alternating row pattern
-            # Draw light grey square for even rows
-            pygame.draw.rect(screen, 'light grey', [600 - (column* 200), row * 100, 100, 100])
-        else:
-            # Draw light grey square for odd rows (offset by 100 pixels) 
-            pygame.draw.rect(screen, 'light grey', [700 - (column * 200), row * 100, 100, 100])
+    for i in range(8):  # 8 rows for chessboard
+        for j in range(8):  # 8 columns for chessboard
+            # Alternate between light and dark colors
+            color = light_color if (i + j) % 2 == 0 else dark_color
+            pygame.draw.rect(screen, color, pygame.Rect(j * 100, i * 100, 100, 100))
         # Draw the status bar and borders
         pygame.draw.rect(screen, 'grey', [0,800, WIDTH, 100]) # Status bar background
         pygame.draw.rect(screen, 'gold', [0,800, WIDTH, 100], 5) # Status bar border
