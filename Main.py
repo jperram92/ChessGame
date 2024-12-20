@@ -155,9 +155,9 @@ def check_options(pieces, locations, turn):
             moves_list = check_pawn(location, turn)
         elif piece == 'rook':
             moves_list = check_rook(location, turn)
-        '''elif piece == 'knight':
+        elif piece == 'knight':
             moves_list = check_knight(location, turn)
-        elif piece == 'bishop':
+        '''elif piece == 'bishop':
             moves_list = check_bishop(location, turn)
         elif piece == 'queen':
             moves_list = check_queen(location, turn)
@@ -267,11 +267,25 @@ def check_rook(position, colour):
                 chain += 1
             else:
                 path = False
-
     return moves_list
 
 def check_knight(position, colour):
-    pass
+    moves_list = []
+    if colour == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+
+    #8squares overall to check for knights to go, they go two squares in one direction and one in another (L Shape)
+    targets = [(1,2),(1,-2),(2,1),(2,-1),(-1,2),(-1,-2),(-2,1),(-2,-1)]
+    for i in range(8):
+        target = (position[0] + targets [i][0], position[1] + targets[i][1])
+        #square on board and friendly
+        if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
+            moves_list.append(target)
+    return moves_list
 
 def check_bishop(position, colour):
     pass
