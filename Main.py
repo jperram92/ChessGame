@@ -105,6 +105,9 @@ small_black_images = [black_pawn_small, black_queen_small, black_king_small, bla
 # Used to map piece types to their respective images and identify pieces during gameplay logic.
 piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 
+#check variables /flashing counter
+counter = 0
+
 
 #function to draw the board onto the screen
 def draw_board():
@@ -224,19 +227,44 @@ def check_valid_moves():
 
 #draw captured pieces on the side of the screen
 def draw_captured():
+    # Loop through the captured white pieces
     for i in range(len(captured_pieces_white)):
-        captured_piece = captured_pieces_white[i]
-        #to find the acutal indexed piece which was captured
+        captured_piece = captured_pieces_white[i]  # Get the name of the captured piece
+        # Find the index of the captured piece in the piece_list to match the correct image
         index = piece_list.index(captured_piece)
-        #45 by 45 squares originally
+        # Draw the small-sized black piece image on the side panel for captured white pieces
+        # The x-coordinate (825) ensures alignment in the left part of the side panel
+        # The y-coordinate (5 + 50*i) spaces pieces vertically with 50 pixels per piece
         screen.blit(small_black_images[index], (825, 5 + 50*i))
     for i in range(len(captured_pieces_black)):
-        captured_piece = captured_pieces_black[i]
-        #to find the acutal indexed piece which was captured
+        captured_piece = captured_pieces_black[i] # Get the name of the captured piece
+        # Find the index of the captured piece in the piece_list to match the correct image
         index = piece_list.index(captured_piece)
-        #45 by 45 squares originally
+        # Draw the small-sized black piece image on the side panel for captured white pieces
+        # The x-coordinate (825) ensures alignment in the left part of the side panel
+        # The y-coordinate (5 + 50*i) spaces pieces vertically with 50 pixels per piece
         screen.blit(small_white_images[index], (925, 5 + 50*i))
-    
+
+def draw_check():
+    if turn_step < 2: 
+        if 'king' in white_pieces: 
+            king_index = white_pieces.index('king')
+            king_location = white_locations[king_index]
+            for i in range(len(black_options)):
+                if king_location in black_options[i]:
+                    if counter < 15:
+                        pygame.draw.rect(screen, 'dark red', [white_locations[king_index][0] * 100 + 1,
+                                                                white_locations[king_index][1] * 100 + 1, 100, 100], 5)
+    else:
+        if 'king' in black_pieces:
+            king_index = black_pieces.index('king')
+            king_location = black_locations[king_index]
+            for i in range(len(white_options)):
+                if king_location in white_options[i]:
+                    if counter < 15:
+                        pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * 100 + 1,
+                                                                black_locations[king_index][1] * 100 + 1, 100, 100], 5)
+
 #Check for how the pawn will move, validate and take pieces
 def check_pawn(position, color):
     moves_list = []
@@ -424,11 +452,15 @@ white_options = check_options(white_pieces, white_locations, 'white') # Initiali
 run = True # Main loop condition
 while run: 
     timer.tick(fps) # Maintain a consistent frame rate
+    if counter < 30:
+        counter += 1
+    else:
+        counter = 0
     screen.fill('dark grey') # Clear the screen with a background color
     draw_board() # Draw the chessboard
     draw_pieces() # Draw the current positions of the pieces
     draw_captured() #Draw the pieces captured and position on the screen (Using Mini pieces)
-
+    draw_check() #draw if the king is in check or checkmate
     # Highlight valid moves if a piece is selected
     if selection != 100:
         valid_moves = check_valid_moves() # Get the valid moves for the selected piece
