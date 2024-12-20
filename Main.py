@@ -138,6 +138,7 @@ def draw_board():
             # Horizontal lines
             pygame.draw.line(screen, 'black', (0, 100 * i), (800, 100 * i), 2)
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
+        screen.blit(medium_font.render('Quit', True, 'black'), (810, 810))
 #function to draw the pieces onto the board from the images in the file
 def draw_pieces():
     # Loop through all white pieces and draw them on the board
@@ -481,7 +482,7 @@ while run:
             run = False # Exit the game if the quit event is triggered
 
         # Handle left mouse button clicks
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
             #Floor division divides down to determine number
             x_coord = event.pos[0] // 100 # Get the x-coordinate of the clicked square
             y_coord = event.pos[1] // 100 # Get the y-coordinate of the clicked square
@@ -489,6 +490,8 @@ while run:
 
             # Handle White's turn
             if turn_step <= 1:
+                if click_coords == (8, 8) or click_coords == (9, 8):
+                    winner = 'black'
                 if click_coords in white_locations: # Check if clicked on a white piece
                     selection = white_locations.index(click_coords) # Select the piece
                     if turn_step == 0:
@@ -513,6 +516,8 @@ while run:
             
             # Handle Black's turn
             if turn_step > 1:
+                if click_coords == (8, 8) or click_coords == (9, 8):
+                    winner = 'white'
                 if click_coords in black_locations: # Check if clicked on a black piece
                     selection = black_locations.index(click_coords) # Select the piece
                     if turn_step == 2:
@@ -533,11 +538,34 @@ while run:
                     turn_step = 0 # Switch to White's turn
                     selection = 100 # Reset selection
                     valid_moves = [] # Clear valid moves
+        if event.type == pygame.KEYDOWN and game_over:
+            if event.key == pygame.K_RETURN:
+                game_over = False
+                winner = ''
+                white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+                # Initial positions of white pieces on the board (x, y coordinates)
+                white_locations = [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (7,0),
+                                (0,1), (1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1)]
+                # List of black pieces in their starting order
+                black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+                                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+                # Initial positions of black pieces on the board (x, y coordinates)
+                black_locations = [(0,7), (1,7), (2,7), (3,7), (4,7), (5,7), (6,7), (7,7),
+                                (0,6), (1,6), (2,6), (3,6), (4,6), (5,6), (6,6), (7,6)]
+                # Lists to track captured pieces for each player (empty at the start)
+                captured_pieces_white = [] # Pieces captured by white player
+                captured_pieces_black = [] # Pieces captured by black player
+                turn_step = 0
+                selection = 100
+                valid_moves = []
+                black_options = check_options(black_pieces, black_locations, 'black') # Initialize valid moves for black pieces
+                white_options = check_options(white_pieces, white_locations, 'white') # Initialize valid moves for white pieces
 
     if winner != '':
         game_over = True
         draw_game_over()      
-                 
+
     pygame.display.flip() # Update the display after drawing
 pygame.quit() # Close the game when the loop ends
 
