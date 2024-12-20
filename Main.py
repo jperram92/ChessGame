@@ -106,34 +106,31 @@ black_white_images = [black_pawn_small, black_queen_small, black_king_small, bla
 piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 
 
-#draw main game board
-#8 by 8, every square can be divided into 1 colour and the other standard (black background not grey)
+
 def draw_board():
-    #as "I" into every box/square (Alternating pattern) -- 64 rectange, each odd is opposite colour
+    # Draw the chessboard grid with alternating colors
     for i in range(32):
-        #i remainder 4, remainder is when divided
-        column = i % 4
-        # round down to nearest whole integer - Expect to be 0 (rounding down)
-        row = i // 4
-        #if remainder of row division = 2
-        if row % 2 == 0:
-            #refer to the initial column to ensure fitting the rectanges being drawn
+        column = i % 4 # Determine the column based on index
+        row = i // 4 # Determine the row based on index
+        if row % 2 == 0:  # Check for alternating row pattern
+            # Draw light grey square for even rows
             pygame.draw.rect(screen, 'light grey', [600 - (column* 200), row * 100, 100, 100])
         else:
-            #offset horizontally by 100 and move it from previous setup 
+            # Draw light grey square for odd rows (offset by 100 pixels) 
             pygame.draw.rect(screen, 'light grey', [700 - (column * 200), row * 100, 100, 100])
+        # Draw the status bar and borders
+        pygame.draw.rect(screen, 'grey', [0,800, WIDTH, 100]) # Status bar background
+        pygame.draw.rect(screen, 'gold', [0,800, WIDTH, 100], 5) # Status bar border
+        pygame.draw.rect(screen, 'gold', [800,0, 200, 100], 5) # Side panel border
 
-        pygame.draw.rect(screen, 'grey', [0,800, WIDTH, 100])
-        pygame.draw.rect(screen, 'gold', [0,800, WIDTH, 100], 5)
-        pygame.draw.rect(screen, 'gold', [800,0, 200, 100], 5)
+        # Display game status text
         status_text = ['White: Select a Place to Move!', 'White: Select a Destination!',
                         'Black: Select a Place to Move!', 'Black: Select a Destination!']
-        # Render and display the current status text (e.g., player turn) at the specified position (x=20, y=820)
-        # The status_text is selected based on the value of 'turn_step', which determines the current game state
-        # The text is rendered with the 'big_font' and is colored black
         screen.blit(big_font.render(status_text[turn_step], True, 'black'), (20,820))
-        #this is to draw the lines for each horizontal + vertical, row 112 is for horizontal, vertical is opposite logic (Change X & Y interchangeably)
+
+        # Draw the grid lines for the board
         for i in range (9):
+            # Horizontal lines
             pygame.draw.line(screen, 'black', (0, 100 * i), (800, 100 * i), 2)
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
 
