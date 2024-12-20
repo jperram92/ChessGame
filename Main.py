@@ -1,5 +1,6 @@
 import pygame
 
+#Initialize Pygame and set up the game window, fonts, and frame rate
 pygame.init()
 WIDTH = 1000
 HEIGHT = 900
@@ -11,29 +12,40 @@ big_font = pygame.font.Font('freesansbold.ttf', 50)
 timer = pygame.time.Clock()
 fps = 60
 
-#game variables and images
+# Define initial piece setup for white and black players, along with their respective positions
+# List of white pieces in their starting order
+
 white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+# Initial positions of white pieces on the board (x, y coordinates)
 white_locations = [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (7,0),
                    (0,1), (1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1)]
+# List of black pieces in their starting order
 black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+# Initial positions of black pieces on the board (x, y coordinates)
 black_locations = [(0,7), (1,7), (2,7), (3,7), (4,7), (5,7), (6,7), (7,7),
                    (0,6), (1,6), (2,6), (3,6), (4,6), (5,6), (6,6), (7,6)]
-captured_pieces_white = []
-captured_pieces_black = []
+# Lists to track captured pieces for each player (empty at the start)
+captured_pieces_white = [] # Pieces captured by white player
+captured_pieces_black = [] # Pieces captured by black player
 
-# 0 white turn no selection : 1-whites turn piece selected: 2- black turn no selection 
-# 3- black turn piece selected
+# Variables to track the game's current state
+turn_step = 0  # Indicates the current turn and state of the game:
+               # 0 - White's turn, no piece selected
+               # 1 - White's turn, piece selected
+               # 2 - Black's turn, no piece selected
+               # 3 - Black's turn, piece selected
 
-turn_step = 0
-selection = 100
-valid_moves = []
+selection = 100 # Index of the currently selected piece (100 indicates no piece is selected)
 
-# Load in game piece images (Queen, King, Rook, Knight, Bishop, Pawn)
+valid_moves = [] # List to store valid moves for the currently selected piece
+
+# Black pieces: Load images from the 'Images' folder, scale to standard size (80x80) 
+# and small size (for captured pieces display or UI elements) 
 black_queen = pygame.image.load('Images/black queen.png')
-black_queen = pygame.transform.scale(black_queen, (80, 80))
-black_queen_small = pygame.transform.scale(black_queen, (45, 45))
+black_queen = pygame.transform.scale(black_queen, (80, 80)) # Standard size
+black_queen_small = pygame.transform.scale(black_queen, (45, 45)) # Small size
 black_king = pygame.image.load('Images/black king.png')
 black_king = pygame.transform.scale(black_king, (80, 80))
 black_king_small = pygame.transform.scale(black_king, (45, 45))
@@ -50,9 +62,11 @@ black_pawn = pygame.image.load('Images/black pawn.png')
 black_pawn = pygame.transform.scale(black_pawn, (80, 80))
 black_pawn_small = pygame.transform.scale(black_pawn, (35, 35))
 
+# White pieces: Load images from the 'Images' folder, scale to standard size (80x80)
+# and small size (for captured pieces display or UI elements)
 white_queen = pygame.image.load('Images/white queen.png')
-white_queen = pygame.transform.scale(white_queen, (80, 80))
-white_queen_small = pygame.transform.scale(white_queen, (45, 45))
+white_queen = pygame.transform.scale(white_queen, (80, 80)) # Standard size
+white_queen_small = pygame.transform.scale(white_queen, (45, 45)) # Small size
 white_king = pygame.image.load('Images/white king.png')
 white_king = pygame.transform.scale(white_king, (80, 80))
 white_king_small = pygame.transform.scale(white_king, (45, 45))
@@ -69,18 +83,28 @@ white_pawn = pygame.image.load('Images/white pawn.png')
 white_pawn = pygame.transform.scale(white_pawn, (80, 80))
 white_pawn_small = pygame.transform.scale(white_pawn, (35, 35))
 
-#Load in lists for each colour to match the associated image or small image
+# Grouping loaded images into lists for easier reference and usage in the game
+
+# List of standard-sized images for white pieces
+# Used to draw white pieces on the game board during gameplay
 white_images = [white_pawn, white_queen, white_king, white_knight, white_rook, white_bishop]
+# List of small-sized images for white pieces
+# Used for displaying captured white pieces in the UI or sidebar
 small_white_images = [white_pawn_small, white_queen_small, white_king_small, white_knight_small, 
     white_rook_small, white_bishop_small]
+# List of standard-sized images for black pieces
+# Used to draw black pieces on the game board during gameplay
 black_images = [black_pawn, black_queen, black_king, black_knight, black_rook, black_bishop]
+# List of small-sized images for black pieces
+# Used for displaying captured black pieces in the UI or sidebar
 black_white_images = [black_pawn_small, black_queen_small, black_king_small, black_knight_small, 
     black_rook_small, black_bishop_small]
 
-#use piece list to match the associated list abpve (Index 0 = Pawn, 1 = queen, etc)
+# List of chess piece types
+# This list defines the standard names of all possible chess pieces.
+# Used to map piece types to their respective images and identify pieces during gameplay logic.
 piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 
-#check variables flashing counter
 
 #draw main game board
 #8 by 8, every square can be divided into 1 colour and the other standard (black background not grey)
@@ -187,7 +211,7 @@ def check_valid_moves():
         options_list = black_options
     valid_options = options_list[selection]
     return valid_options
-
+#Check for how the pawn will move, validate and take pieces
 def check_pawn(position, color):
     moves_list = []
     #turn taking
@@ -226,7 +250,7 @@ def check_pawn(position, color):
         if (position[0] - 1, position[1] - 1) in white_locations:
             moves_list.append((position[0] - 1, position[1] - 1))   
     return moves_list
-
+#Check for how the rook will move, validate and take pieces
 def check_rook(position, colour):
     moves_list = []
     if colour == 'white':
@@ -268,7 +292,7 @@ def check_rook(position, colour):
             else:
                 path = False
     return moves_list
-
+#Check for how the knight will move, validate and take pieces
 def check_knight(position, colour):
     moves_list = []
     if colour == 'white':
@@ -286,7 +310,7 @@ def check_knight(position, colour):
         if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
             moves_list.append(target)
     return moves_list
-
+#Check for how the bishop will move, validate and take pieces
 def check_bishop(position, colour):
     moves_list = []
     if colour == 'white':
@@ -318,14 +342,14 @@ def check_bishop(position, colour):
             else:
                 path = False  # Stop if out of bounds
     return moves_list
-
+#Check for how the queen will move, validate and take pieces
 def check_queen(position, colour):
     moves_list = check_bishop(position, colour)
     second_list = check_rook(position, colour)
     for i in range(len(second_list)):
         moves_list.append(second_list[i])
     return moves_list
-
+#Check for how the king will move, validate and take pieces
 def check_king(position, colour):
     moves_list = []
     if colour == 'white':
