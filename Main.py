@@ -344,8 +344,6 @@ def check_king(position, colour):
 
     return moves_list
 
-
-
 # Main Loop If the game is running, using FPS blocker + screen being filled
 black_options = check_options(black_pieces, black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
@@ -422,12 +420,8 @@ while run:
                     selection = 100 
                     #every new turn, they need to recalculate what is considered valid or not
                     valid_moves = []
-
     pygame.display.flip()
-
 pygame.quit()
-
-
 
 #git config --global user.name "jamesperram92"
 #git config --global user.email "jamesperram@gmail.com"
