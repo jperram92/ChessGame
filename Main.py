@@ -161,8 +161,8 @@ def check_options(pieces, locations, turn):
             moves_list = check_bishop(location, turn)
         elif piece == 'queen':
             moves_list = check_queen(location, turn)
-        '''elif piece == 'king':
-            moves_list = check_king(location, turn)'''
+        elif piece == 'king':
+            moves_list = check_king(location, turn)
         all_moves_list.append(moves_list)
     return all_moves_list
 
@@ -327,7 +327,25 @@ def check_queen(position, colour):
     return moves_list
 
 def check_king(position, colour):
-    pass
+    moves_list = []
+    if colour == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+    #8 square to check surrounding squares in + 1 movement direction any direction
+    targets = [(1,0),(1,1),(1,-1),(-1,0),(-1,-1),(-1,1),(0,1),(0,-1)]
+    for i in range(8):
+        target = (position[0] + targets [i][0], position[1] + targets[i][1])
+        #square on board and friendly
+        if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
+            moves_list.append(target)
+
+    return moves_list
+
+
+
 # Main Loop If the game is running, using FPS blocker + screen being filled
 black_options = check_options(black_pieces, black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
