@@ -171,7 +171,8 @@ def draw_theme_menu():
             pygame.draw.rect(screen, 'black', rect, 3, border_radius=10)  # Default border
 
         # Render the theme name and center it over the button
-        text_surface = font.render(theme, True, 'black' if theme != "Classic" else 'white')
+        text_color = 'white' if theme in ["Ocean", "Classic"] else 'black'
+        text_surface = font.render(theme, True, text_color)
         text_x = rect.x + (rect.width - text_surface.get_width()) // 2
         text_y = rect.y + (rect.height - text_surface.get_height()) // 2
         screen.blit(text_surface, (text_x, text_y))
