@@ -223,7 +223,7 @@ def check_pawn(position, color):
         if (position[0] + 1, position[1] - 1) in white_locations:
             moves_list.append((position[0] + 1, position[1] - 1))
         #diagonal attack vector as it can take pawns diagnoally left
-        if (position[0] + 1, position[1] - 1) in white_locations:
+        if (position[0] - 1, position[1] - 1) in white_locations:
             moves_list.append((position[0] - 1, position[1] - 1))   
     return moves_list
 
