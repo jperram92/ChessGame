@@ -157,9 +157,9 @@ def check_options(pieces, locations, turn):
             moves_list = check_rook(location, turn)
         elif piece == 'knight':
             moves_list = check_knight(location, turn)
-        '''elif piece == 'bishop':
+        elif piece == 'bishop':
             moves_list = check_bishop(location, turn)
-        elif piece == 'queen':
+        '''elif piece == 'queen':
             moves_list = check_queen(location, turn)
         elif piece == 'king':
             moves_list = check_king(location, turn)'''
@@ -288,7 +288,37 @@ def check_knight(position, colour):
     return moves_list
 
 def check_bishop(position, colour):
-    pass
+    moves_list = []
+    if colour == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+
+    # Loop through the 4 diagonal directions
+    directions = [(1, -1), (-1, -1), (1, 1), (-1, 1)]  # Up-right, Up-left, Down-right, Down-left
+    for direction in directions:
+        path = True
+        chain = 1
+        while path:
+            new_x = position[0] + (chain * direction[0])
+            new_y = position[1] + (chain * direction[1])
+            # Check if the position is within bounds
+            if 0 <= new_x <= 7 and 0 <= new_y <= 7:
+                new_position = (new_x, new_y)
+                if new_position in friends_list:
+                    path = False  # Blocked by a friendly piece
+                elif new_position in enemies_list:
+                    moves_list.append(new_position)  # Capture enemy piece
+                    path = False  # Stop further movement
+                else:
+                    moves_list.append(new_position)  # Add valid empty square
+                chain += 1
+            else:
+                path = False  # Stop if out of bounds
+    return moves_list
+
 
 def check_queen(position, colour):
     pass
