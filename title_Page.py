@@ -38,8 +38,9 @@ lion_image = pygame.transform.scale(lion_image, (80, 80))  # Set size of the lio
 elephant_image = pygame.image.load('elephant_image.jpg')  # Path to elephant image
 elephant_image = pygame.transform.scale(elephant_image, (100, 100))  # Set size of the elephant
 
-# Button Rect
-button_rect = pygame.Rect(400, 600, 200, 50)
+# Button Rects
+start_button_rect = pygame.Rect(400, 600, 200, 50)
+vs_computer_button_rect = pygame.Rect(400, 675, 200, 50)  # "Vs Computer" button below the "Start Game" button
 
 # Animation settings
 text_y = 100  # Fixing the title position
@@ -140,17 +141,26 @@ while running:
     if button_opacity < 255:
         button_opacity += fade_in_speed
 
-    # Draw Start Button
-    pygame.draw.rect(screen, DARK_OAK, button_rect)
-    pygame.draw.rect(screen, OAK_COLOR, button_rect.inflate(-10, -10))  # Create a slightly smaller rectangle inside
-    start_text = button_font.render("Start Game", True, WHITE)
-    screen.blit(start_text, (button_rect.x + (button_rect.width - start_text.get_width()) // 2,
-                             button_rect.y + (button_rect.height - start_text.get_height()) // 2))
+    # Draw "Start Game" Button
+    pygame.draw.rect(screen, DARK_OAK, start_button_rect)
+    pygame.draw.rect(screen, OAK_COLOR, start_button_rect.inflate(-10, -10))  # Create a slightly smaller rectangle inside
+    start_text = button_font.render("Vs Computer", True, WHITE)
+    screen.blit(start_text, (start_button_rect.x + (start_button_rect.width - start_text.get_width()) // 2,
+                             start_button_rect.y + (start_button_rect.height - start_text.get_height()) // 2))
 
-    # Handle mouse hover effect for the button
+    # Draw "Vs Computer" Button
+    pygame.draw.rect(screen, DARK_OAK, vs_computer_button_rect)
+    pygame.draw.rect(screen, OAK_COLOR, vs_computer_button_rect.inflate(-10, -10))  # Create a slightly smaller rectangle inside
+    vs_computer_text = button_font.render("Vs Computer", True, WHITE)
+    screen.blit(vs_computer_text, (vs_computer_button_rect.x + (vs_computer_button_rect.width - vs_computer_text.get_width()) // 2,
+                                  vs_computer_button_rect.y + (vs_computer_button_rect.height - vs_computer_text.get_height()) // 2))
+
+    # Handle mouse hover effect for the buttons
     mouse_x, mouse_y = pygame.mouse.get_pos()
-    if button_rect.collidepoint(mouse_x, mouse_y):
-        pygame.draw.rect(screen, HIGHLIGHT_COLOR, button_rect.inflate(-10, -10), 5)
+    if start_button_rect.collidepoint(mouse_x, mouse_y):
+        pygame.draw.rect(screen, HIGHLIGHT_COLOR, start_button_rect.inflate(-10, -10), 5)
+    if vs_computer_button_rect.collidepoint(mouse_x, mouse_y):
+        pygame.draw.rect(screen, HIGHLIGHT_COLOR, vs_computer_button_rect.inflate(-10, -10), 5)
 
     # Display the screen
     pygame.display.flip()
@@ -160,10 +170,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
-            if button_rect.collidepoint(mouse_x, mouse_y):
+            if start_button_rect.collidepoint(mouse_x, mouse_y):
                 print("Game starting...")  # You can replace this with a function to start the game
                 os.system('python "Chess Game v2.py"')  # This will run the Chess Game v2.py script
                 running = False  # Close the entrance page after clicking the start button
+            elif vs_computer_button_rect.collidepoint(mouse_x, mouse_y):
+                print("Vs Computer mode starting...")  # This will be for the "Vs Computer" functionality
+                os.system('python "Chess Game v2 Computer.py"')  # Example for running the computer mode script
+                running = False  # Close the entrance page after clicking "Vs Computer"
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:  # Allow escape key to exit
