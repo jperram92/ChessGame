@@ -136,21 +136,28 @@ counter = 0
 winner = ''
 game_over = False
 
+# AI Function to simulate selecting a random piece and making a move for black
 def ai_move_black():
     # Get the valid moves for each of the black pieces
     all_black_moves = check_options(black_pieces, black_locations, 'black')
     
-    # Flatten the list of moves (valid moves for all pieces)
-    flat_black_moves = []
+    # Filter out pieces that have no valid moves
+    valid_pieces_with_moves = []
     for i, moves in enumerate(all_black_moves):
-        for move in moves:
-            flat_black_moves.append((i, move))  # (piece index, move)
+        if moves:  # If there are valid moves for this piece
+            valid_pieces_with_moves.append(i)  # Store the index of the piece with valid moves
     
-    # If there are valid moves, pick a random move
-    if flat_black_moves:
-        selected_piece, selected_move = random.choice(flat_black_moves)
-        return selected_piece, selected_move
-    return None, None
+    # If there are valid pieces with moves, choose one at random
+    if valid_pieces_with_moves:
+        selected_piece_index = random.choice(valid_pieces_with_moves)
+        valid_moves = all_black_moves[selected_piece_index]
+        
+        # Randomly choose a valid move for the selected piece
+        selected_move = random.choice(valid_moves)
+        
+        # Return the selected piece and the move
+        return selected_piece_index, selected_move
+    return None, None  # No valid moves
 
 # Function to draw the promotion menu at the bottom of the screen
 def draw_promotion_menu(player_color):
@@ -777,6 +784,30 @@ while run:
             valid_moves = check_valid_moves()
             draw_valid(valid_moves)
 
+    # Auto-move for the AI on black's turn
+    if turn_step >= 2:  # Black's turn
+        selected_piece, selected_move = ai_move_black()
+        if selected_piece is not None and selected_move is not None:
+            # Apply AI move
+            black_locations[selected_piece] = selected_move
+            if selected_move in white_locations:
+                white_piece = white_locations.index(selected_move)
+                captured_pieces_black.append(white_pieces[white_piece])
+                if white_pieces[white_piece] == 'king':
+                    winner = 'black'
+                white_pieces.pop(white_piece)
+                white_locations.pop(white_piece)
+
+                # Call the function to speak the buzzword when a piece is captured
+                speak_capture_message()  # Speak the random word when a piece is captured
+                show_capture_message()  # Display the random word at the bottom of the screen
+
+            black_options = check_options(black_pieces, black_locations, 'black')
+            white_options = check_options(white_pieces, white_locations, 'white')
+            turn_step = 0  # Switch to white's turn after black's move
+            selection = 100
+            valid_moves = []
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -814,7 +845,7 @@ while run:
                 if not menu_open and 850 <= event.pos[0] <= 950 and 750 <= event.pos[1] <= 790:
                     menu_open = True  # Open the menu if the button is clicked
 
-                # Handle the rest of the game logic
+                # Handle the rest of the game logic for white's turn
                 if turn_step <= 1:  # White's turn
                     if click_coords in white_locations:
                         selection = white_locations.index(click_coords)
@@ -837,29 +868,6 @@ while run:
                         black_options = check_options(black_pieces, black_locations, 'black')
                         white_options = check_options(white_pieces, white_locations, 'white')
                         turn_step = 2
-                        selection = 100
-                        valid_moves = []
-
-                elif turn_step > 1:  # Black's turn
-                    # AI makes a random move for black when it's black's turn
-                    selected_piece, selected_move = ai_move_black()
-                    if selected_piece is not None and selected_move is not None:
-                        black_locations[selected_piece] = selected_move
-                        if selected_move in white_locations:
-                            white_piece = white_locations.index(selected_move)
-                            captured_pieces_black.append(white_pieces[white_piece])
-                            if white_pieces[white_piece] == 'king':
-                                winner = 'black'
-                            white_pieces.pop(white_piece)
-                            white_locations.pop(white_piece)
-
-                            # Call the function to speak the buzzword when a piece is captured
-                            speak_capture_message()  # Speak the random word when a piece is captured
-                            show_capture_message()  # Display the random word at the bottom of the screen
-
-                        black_options = check_options(black_pieces, black_locations, 'black')
-                        white_options = check_options(white_pieces, white_locations, 'white')
-                        turn_step = 0  # Switch to white's turn after black's move
                         selection = 100
                         valid_moves = []
 
