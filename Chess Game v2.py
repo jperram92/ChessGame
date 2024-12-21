@@ -21,6 +21,8 @@ medium_font = pygame.font.Font('freesansbold.ttf', 40)
 big_font = pygame.font.Font('freesansbold.ttf', 50)   
 timer = pygame.time.Clock()
 fps = 60
+# Define the TTS toggle flag
+tts_enabled = True  # Initially, TTS is enabled
 
 # Add color themes for the board
 color_themes = {
@@ -132,6 +134,28 @@ counter = 0
 winner = ''
 game_over = False
 
+# Function to draw the Mute Buzzwords button at the bottom-right corner
+def draw_tts_button():
+    # Position the button inside the checkered box (bottom-right corner)
+    button_rect = pygame.Rect(650, 600, 300, 50)  # Adjusted to the bottom-right inside the checkered area
+    pygame.draw.rect(screen, 'black', button_rect)  # Button background
+    pygame.draw.rect(screen, 'white', button_rect, 2)  # Button border
+    
+    # Determine the button text based on TTS state
+    tts_status_text = "Mute Buzzwords: ON" if tts_enabled else "Mute Buzzwords: OFF"
+    text_surface = font.render(tts_status_text, True, 'white')  # Text for the button
+    text_x = button_rect.x + (button_rect.width - text_surface.get_width()) // 2
+    text_y = button_rect.y + (button_rect.height - text_surface.get_height()) // 2
+    screen.blit(text_surface, (text_x, text_y))  # Draw the text on the button
+
+# Function to check if the "Mute Buzzwords" button was clicked inside the checkered area
+def handle_tts_button_click(pos):
+    global tts_enabled
+    button_rect = pygame.Rect(650, 600, 300, 50)  # The area where the button is located
+    if button_rect.collidepoint(pos):  # Check if the click is within the bounds of the button
+        tts_enabled = not tts_enabled  # Toggle TTS state
+        print(f"TTS Enabled: {tts_enabled}")  # Optional: Print the current state to the console
+
 # Function to load captured words from the JSON file
 def load_captured_words():
     with open('captured_words.json', 'r') as file:
@@ -145,9 +169,10 @@ def get_random_captured_word():
 
 # Function to speak the random message using text-to-speech
 def speak_capture_message():
-    message = get_random_captured_word()  # Get the randomly selected word
-    engine.say(message)  # Speak the word
-    engine.runAndWait()  # Wait for the speech to finish before continuing
+    if tts_enabled:  # Only speak if TTS is enabled
+        message = get_random_captured_word()  # Get the randomly selected word
+        engine.say(message)  # Speak the word
+        engine.runAndWait()  # Wait for the speech to finish before continuing
 
 # Function to display the random message at the bottom of the screen
 def show_capture_message():
@@ -209,6 +234,9 @@ def draw_theme_menu():
         text_x = rect.x + (rect.width - text_surface.get_width()) // 2
         text_y = rect.y + (rect.height - text_surface.get_height()) // 2
         screen.blit(text_surface, (text_x, text_y))
+
+    # Draw the TTS toggle button
+    draw_tts_button()
 
 #Menu button        
 def draw_menu_button():
@@ -604,7 +632,11 @@ while run:
                     current_theme = selected_theme
                     light_color, dark_color = color_themes[current_theme]
                     menu_open = False
+
+                # Handle the TTS button click
+                handle_tts_button_click(event.pos)  # Toggle TTS when clicked
             else:
+                # Regular game event logic (piece selection, move, etc.)
                 x_coord = event.pos[0] // 100
                 y_coord = event.pos[1] // 100
                 click_coords = (x_coord, y_coord)
