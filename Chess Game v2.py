@@ -1,4 +1,14 @@
 import pygame
+import json
+import random
+import pyttsx3  # Import the TTS engine
+
+# Initialize Pygame and the mixer for sound
+pygame.init()
+pygame.mixer.init()  # Initialize the Pygame mixer module for sound
+
+# Initialize pyttsx3 for text-to-speech
+engine = pyttsx3.init()
 
 #Initialize Pygame and set up the game window, fonts, and frame rate
 pygame.init()
@@ -121,6 +131,29 @@ piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 counter = 0
 winner = ''
 game_over = False
+
+# Function to load captured words from the JSON file
+def load_captured_words():
+    with open('captured_words.json', 'r') as file:
+        data = json.load(file)
+    return data['captured_words']
+
+# Function to randomly select a word from the captured words
+def get_random_captured_word():
+    captured_words = load_captured_words()
+    return random.choice(captured_words)
+
+# Function to speak the random message using text-to-speech
+def speak_capture_message():
+    message = get_random_captured_word()  # Get the randomly selected word
+    engine.say(message)  # Speak the word
+    engine.runAndWait()  # Wait for the speech to finish before continuing
+
+# Function to display the random message at the bottom of the screen
+def show_capture_message():
+    message = get_random_captured_word()  # Randomly selected word
+    print(message)  # Print to the console (can be shown on screen as well)
+    screen.blit(font.render(message, True, 'white'), (300, 820))  # Display the message at the bottom of the screen
 
 # Updated function to center the menu and improve the title block size
 def draw_theme_menu():
@@ -597,6 +630,11 @@ while run:
                             black_pieces.pop(black_piece)
                             black_locations.pop(black_piece)
 
+                            # Call the function to speak the buzzword when a piece is captured
+                            speak_capture_message()  # Speak the random word when a piece is captured
+                            show_capture_message()  # Display the random word at the bottom of the screen
+
+
                         black_options = check_options(black_pieces, black_locations, 'black')
                         white_options = check_options(white_pieces, white_locations, 'white')
                         turn_step = 2
@@ -617,6 +655,10 @@ while run:
                                 winner = 'black'
                             white_pieces.pop(white_piece)
                             white_locations.pop(white_piece)
+
+                            # Call the function to speak the buzzword when a piece is captured
+                            speak_capture_message()  # Speak the random word when a piece is captured
+                            show_capture_message()  # Display the random word at the bottom of the screen
 
                         black_options = check_options(black_pieces, black_locations, 'black')
                         white_options = check_options(white_pieces, white_locations, 'white')
