@@ -144,7 +144,7 @@ while running:
     # Draw "Start Game" Button
     pygame.draw.rect(screen, DARK_OAK, start_button_rect)
     pygame.draw.rect(screen, OAK_COLOR, start_button_rect.inflate(-10, -10))  # Create a slightly smaller rectangle inside
-    start_text = button_font.render("Vs Computer", True, WHITE)
+    start_text = button_font.render("Vs Human", True, WHITE)
     screen.blit(start_text, (start_button_rect.x + (start_button_rect.width - start_text.get_width()) // 2,
                              start_button_rect.y + (start_button_rect.height - start_text.get_height()) // 2))
 
