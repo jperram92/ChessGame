@@ -134,6 +134,12 @@ counter = 0
 winner = ''
 game_over = False
 
+# Define the game over screen
+def draw_game_over():
+    pygame.draw.rect(screen, 'black', [200, 200, 400, 70])
+    screen.blit(font.render(f'{winner} won the game by forfeit!', True, 'white'), (210, 210))
+    screen.blit(font.render(f'Press ENTER to restart!', True, 'white'), (210, 240))
+
 # Function to draw the Mute Buzzwords button at the bottom-right corner
 def draw_tts_button():
     # Position the button inside the checkered box (bottom-right corner)
@@ -154,7 +160,7 @@ def handle_tts_button_click(pos):
     button_rect = pygame.Rect(650, 600, 300, 50)  # The area where the button is located
     if button_rect.collidepoint(pos):  # Check if the click is within the bounds of the button
         tts_enabled = not tts_enabled  # Toggle TTS state
-        print(f"TTS Enabled: {tts_enabled}")  # Optional: Print the current state to the console
+        #print(f"TTS Enabled: {tts_enabled}")  # Optional: Print the current state to the console
 
 # Function to load captured words from the JSON file
 def load_captured_words():
@@ -177,7 +183,7 @@ def speak_capture_message():
 # Function to display the random message at the bottom of the screen
 def show_capture_message():
     message = get_random_captured_word()  # Randomly selected word
-    print(message)  # Print to the console (can be shown on screen as well)
+    #print(message)  # Print to the console (can be shown on screen as well)
     screen.blit(font.render(message, True, 'white'), (300, 820))  # Display the message at the bottom of the screen
 
 # Updated function to center the menu and improve the title block size
@@ -626,6 +632,22 @@ while run:
             run = False
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Get mouse position
+            mouse_x, mouse_y = event.pos
+
+            # Check if the click is inside the "Quit" button area
+            if 810 <= mouse_x <= 910 and 810 <= mouse_y <= 850:
+                if turn_step < 2:  # White's turn
+                    winner = 'Black'  # Black wins if White forfeits
+                else:  # Black's turn
+                    winner = 'White'  # White wins if Black forfeits
+
+                game_over = True  # Set the game to over
+                draw_game_over()  # Display the game over screen
+                #print(f"{winner} wins by forfeit!")  # Debugging message (optional)
+                # No need to exit the program, just stop the game
+                # So we don't set `run = False` here
+
             if menu_open:
                 selected_theme = handle_menu_click(event.pos)
                 if selected_theme:
