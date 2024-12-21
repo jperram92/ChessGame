@@ -288,6 +288,11 @@ def draw_pieces():
     # Loop through all white pieces and draw them on the board
     for i in range(len(white_pieces)):
         # Determine the index of the piece in the piece_list to identify its type
+        # Check if the piece is a pawn and if it has reached the promotion row
+        if white_pieces[i] == 'pawn' and white_locations[i][1] == 7:
+            promote_pawn(i, 'white')  # Promote the pawn when it reaches the last row
+            white_pieces[i] = 'queen'  # Assuming promotion to queen (or handle user selection here)
+        #draw pirce on board    
         index = piece_list.index(white_pieces[i])
         # Check if the piece is a pawn, as pawns have a separate image
         if white_pieces[i] == 'pawn':
@@ -304,7 +309,12 @@ def draw_pieces():
 
 
     for i in range(len(black_pieces)):
-    # Iterate through all black pieces and determine their type using the piece_list index
+         # Similarly for black pieces
+        if black_pieces[i] == 'pawn' and black_locations[i][1] == 0:
+            promote_pawn(i, 'black')  # Promote the pawn when it reaches the last row
+            black_pieces[i] = 'queen'  # Assuming promotion to queen (or handle user selection here)
+
+        # Iterate through all black pieces and determine their type using the piece_list index
         index = piece_list.index(black_pieces[i])
 
         # Check if the current piece is a pawn and draw it using the black_pawn image
@@ -412,6 +422,23 @@ def draw_check():
                         if counter < 15:
                             pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * 100 + 1,
                                                                     black_locations[king_index][1] * 100 + 1, 100, 100], 5)
+#define if pawn is promoted
+def promote_pawn(piece_index, player_color):
+    # Define the available pieces for promotion
+    available_promotions = ['queen', 'rook', 'bishop', 'knight']
+    
+    # Check if the pawn is at the last row (for white: row 7, for black: row 0)
+    if player_color == 'white' and white_locations[piece_index][1] == 7:
+        # Prompt the player to choose a piece for promotion (e.g., via a menu or UI)
+        selected_piece = available_promotions[0]  # Assuming the player chooses 'queen'
+        # Replace the pawn with the selected piece
+        white_pieces[piece_index] = selected_piece
+    elif player_color == 'black' and black_locations[piece_index][1] == 0:
+        # Similarly, for black's pawn
+        selected_piece = available_promotions[0]  # Assuming the player chooses 'queen'
+        # Replace the pawn with the selected piece
+        black_pieces[piece_index] = selected_piece
+
 
 #define if game is over
 def draw_game_over():
