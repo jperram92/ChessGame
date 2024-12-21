@@ -23,6 +23,8 @@ timer = pygame.time.Clock()
 fps = 60
 # Define the TTS toggle flag
 tts_enabled = True  # Initially, TTS is enabled
+# Global variable to store the index of the pawn being promoted
+pawn_index = None  # Initialize with None (or any appropriate initial value)
 
 # Add color themes for the board
 color_themes = {
@@ -133,6 +135,79 @@ piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
 counter = 0
 winner = ''
 game_over = False
+
+# Function to draw the promotion menu at the bottom of the screen
+def draw_promotion_menu(player_color):
+    # Define the menu's background at the bottom of the screen
+    menu_rect = pygame.Rect(200, 720, 700, 80)  # Position at the bottom of the screen
+    pygame.draw.rect(screen, 'black', menu_rect)  # Menu background
+
+    # Draw the menu title
+    screen.blit(font.render('Choose a Piece to Promote:', True, 'white'), (250, 730))
+
+    # List of available promotion options
+    promotion_options = ['Queen', 'Rook', 'Bishop', 'Knight']
+    
+    # Draw the promotion options
+    for i, option in enumerate(promotion_options):
+        piece_rect = pygame.Rect(250 + (i * 150), 770, 100, 50)  # Place the options horizontally
+        pygame.draw.rect(screen, 'white', piece_rect)  # Option button background
+        pygame.draw.rect(screen, 'black', piece_rect, 2)  # Option border
+        
+        # Render the option text and display it on the button
+        option_text = font.render(option, True, 'black')
+        screen.blit(option_text, (piece_rect.x + (piece_rect.width - option_text.get_width()) // 2, 
+                                  piece_rect.y + (piece_rect.height - option_text.get_height()) // 2))
+
+
+# Event handling to promote the pawn
+def handle_piece_selection(pos):
+    piece_rects = {
+        'queen': pygame.Rect(250, 770, 100, 50),
+        'rook': pygame.Rect(400, 770, 100, 50),
+        'bishop': pygame.Rect(550, 770, 100, 50),
+        'knight': pygame.Rect(700, 770, 100, 50)
+    }
+
+    for piece, rect in piece_rects.items():
+        if rect.collidepoint(pos):
+            # Replace the pawn with the selected piece
+            if turn_step < 2:  # White's turn
+                selected_piece = piece
+                white_pieces[pawn_index] = selected_piece
+            else:  # Black's turn
+                selected_piece = piece
+                black_pieces[pawn_index] = selected_piece
+            return selected_piece
+    return None
+
+# Event handling to promote the pawn
+def handle_promotion_selection(pos, player_color):
+    piece_rects = {
+        'queen': pygame.Rect(250, 770, 100, 50),
+        'rook': pygame.Rect(400, 770, 100, 50),
+        'bishop': pygame.Rect(550, 770, 100, 50),
+        'knight': pygame.Rect(700, 770, 100, 50)
+    }
+
+    for piece, rect in piece_rects.items():
+        if rect.collidepoint(pos):
+            # Replace the pawn with the selected piece
+            selected_piece = piece  # Select the piece (queen, rook, bishop, or knight)
+
+            if player_color == 'white':
+                if 0 <= pawn_index < len(white_pieces):  # Ensure valid index
+                    white_pieces[pawn_index] = selected_piece
+                else:
+                    print(f"Invalid pawn index for white: {pawn_index}")  # Debugging message
+            else:  # Black's turn
+                if 0 <= pawn_index < len(black_pieces):  # Ensure valid index
+                    black_pieces[pawn_index] = selected_piece
+                else:
+                    print(f"Invalid pawn index for black: {pawn_index}")  # Debugging message
+
+            return selected_piece  # Return the selected piece
+    return None  # If nothing is clicked, return None
 
 # Define the game over screen
 def draw_game_over():
@@ -422,23 +497,55 @@ def draw_check():
                         if counter < 15:
                             pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * 100 + 1,
                                                                     black_locations[king_index][1] * 100 + 1, 100, 100], 5)
-#define if pawn is promoted
+# Function to handle pawn promotion
 def promote_pawn(piece_index, player_color):
-    # Define the available pieces for promotion
-    available_promotions = ['queen', 'rook', 'bishop', 'knight']
+    global white_pieces, black_pieces, white_locations, black_locations, selection, turn_step, pawn_index
     
-    # Check if the pawn is at the last row (for white: row 7, for black: row 0)
+    # Ensure the pawn_index is valid for promotion
     if player_color == 'white' and white_locations[piece_index][1] == 7:
-        # Prompt the player to choose a piece for promotion (e.g., via a menu or UI)
-        selected_piece = available_promotions[0]  # Assuming the player chooses 'queen'
-        # Replace the pawn with the selected piece
-        white_pieces[piece_index] = selected_piece
-    elif player_color == 'black' and black_locations[piece_index][1] == 0:
-        # Similarly, for black's pawn
-        selected_piece = available_promotions[0]  # Assuming the player chooses 'queen'
-        # Replace the pawn with the selected piece
-        black_pieces[piece_index] = selected_piece
+        pawn_index = piece_index  # Store the index of the promoted pawn
+        draw_promotion_menu(player_color)  # Call the promotion menu for white
 
+    elif player_color == 'black' and black_locations[piece_index][1] == 0:
+        pawn_index = piece_index  # Store the index of the promoted pawn
+        draw_promotion_menu(player_color)  # Call the promotion menu for black
+
+    # Wait for user to select a promotion piece
+    piece_selected = None
+    waiting_for_selection = True
+    
+    while waiting_for_selection:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Handle mouse click to select a piece
+                piece_selected = handle_promotion_selection(event.pos, player_color)
+                if piece_selected:
+                    waiting_for_selection = False
+
+        pygame.display.flip()
+
+    # Ensure the piece_selected is valid and then assign it to the correct list
+    if piece_selected:
+        if player_color == 'white':
+            if 0 <= pawn_index < len(white_pieces):  # Ensure the index is valid
+                white_pieces[pawn_index] = piece_selected
+            else:
+                print(f"Invalid pawn index for white: {pawn_index}")  # Debugging message
+        else:
+            if 0 <= pawn_index < len(black_pieces):  # Ensure the index is valid
+                black_pieces[pawn_index] = piece_selected
+            else:
+                print(f"Invalid pawn index for black: {pawn_index}")  # Debugging message
+
+    # Reset the selection and turn step after the promotion
+    selection = 100
+    if player_color == 'white':
+        turn_step = 2  # Black's turn after white's pawn promotion
+    else:
+        turn_step = 0  # White's turn after black's pawn promotion
 
 #define if game is over
 def draw_game_over():
